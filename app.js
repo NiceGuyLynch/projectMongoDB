@@ -2,7 +2,8 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
+const { MongoClient } = require('mongodb');
+const uri = "mongodb+srv://alligoster:3DcjuKxGptxWCHTP@apimongodb.ry13gwq.mongodb.net/?retryWrites=true&w=majority&appName=APIMongoDB";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -10,13 +11,23 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(bodyParser.json());
 
-// Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/ma_base_de_donnees', {
+// Connexion à MongoDB
+const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true
-})
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.error('Could not connect to MongoDB', err));
+});
+
+async function connectToMongoDB() {
+  try {
+    await client.connect();
+    console.log("Connected to MongoDB");
+  } catch (err) {
+    console.error("Error connecting to MongoDB", err);
+  }
+}
+
+// Appel de la fonction de connexion à MongoDB
+connectToMongoDB();
 
 // Routes
 app.use('/api', require('./routes/api'));
